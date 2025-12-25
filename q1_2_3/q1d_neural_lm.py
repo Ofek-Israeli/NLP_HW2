@@ -82,7 +82,21 @@ def lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions,
 
     # Construct the data batch and run you backpropogation implementation
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # Sample random indices from the training data
+    num_examples = len(in_word_index)
+    sample_indices = np.random.choice(num_examples, size=BATCH_SIZE, replace=False)
+    
+    # Convert input words to GloVe embeddings (vectorized)
+    in_word_indices = np.array([in_word_index[idx] for idx in sample_indices])
+    data = np.array([num_to_word_embedding[idx] for idx in in_word_indices])
+    
+    # Convert output words to one-hot vectors (vectorized)
+    out_word_indices = np.array([out_word_index[idx] for idx in sample_indices])
+    labels = np.zeros((BATCH_SIZE, dimensions[2]))
+    labels[np.arange(BATCH_SIZE), out_word_indices] = 1.0
+    
+    # Run forward and backward propagation
+    cost, grad = forward_backward_prop(data, labels, params, dimensions)
     ### END YOUR CODE
 
     cost /= BATCH_SIZE
@@ -101,7 +115,52 @@ def eval_neural_lm(eval_data_path):
 
     perplexity = 0
     ### YOUR CODE HERE
-    raise NotImplementedError
+    # Load vocabulary first (needed for word_to_num used above, and for vocabsize)
+    vocab = pd.read_table("data/lm/vocab.ptb.txt",
+                          header=None, sep=r"\s+", index_col=0, names=['count', 'freq'])
+    vocabsize = 2000
+    num_to_word = dict(enumerate(vocab.index[:vocabsize]))
+    word_to_num = utils.invert_dict(num_to_word)
+    
+    # Reload data with proper word_to_num (since original template uses undefined word_to_num)
+    _, S_dev = load_data_as_sentences(eval_data_path, word_to_num)
+    in_word_index, out_word_index = convert_to_lm_dataset(S_dev)
+    assert len(in_word_index) == len(out_word_index)
+    num_of_examples = len(in_word_index)
+    
+    # Load saved parameters (from saved_params_40000.npy or most recent)
+    from sgd import load_saved_params
+    
+    # Try to load saved params, or use the most recent one
+    _, params, _ = load_saved_params()
+    if params is None:
+        # If no saved params, try to load saved_params_40000.npy directly
+        if os.path.exists('saved_params_40000.npy'):
+            params = np.load('saved_params_40000.npy')
+        else:
+            raise ValueError("No saved parameters found. Please train the model first.")
+    
+    # Load embeddings and define dimensions (needed for evaluation)
+    num_to_word_embedding = load_vocab_embeddings()
+    input_dim = 50
+    hidden_dim = 50
+    output_dim = vocabsize
+    dimensions = [input_dim, hidden_dim, output_dim]
+    
+    # Compute perplexity
+    log_probs = 0.0
+    for i in range(num_of_examples):
+        # Get GloVe embedding for input word
+        embedding = np.array(num_to_word_embedding[in_word_index[i]])
+        # Reshape to (1, 50) for forward pass
+        data = embedding.reshape(1, -1)
+        # Get probability of correct word
+        prob = forward(data, out_word_index[i], params, dimensions)
+        # Accumulate log probability (add small epsilon to avoid log(0))
+        log_probs += np.log(prob + 1e-10)
+    
+    # Calculate perplexity: exp(-1/M * sum(log(p(correct_word))))
+    perplexity = np.exp(-log_probs / num_of_examples)
     ### END YOUR CODE
 
     return perplexity
