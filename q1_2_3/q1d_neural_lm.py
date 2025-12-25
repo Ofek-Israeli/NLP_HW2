@@ -99,8 +99,6 @@ def lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions,
     cost, grad = forward_backward_prop(data, labels, params, dimensions)
     ### END YOUR CODE
 
-    cost /= BATCH_SIZE
-    grad /= BATCH_SIZE
     return cost, grad
 
 
