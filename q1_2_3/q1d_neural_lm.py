@@ -115,7 +115,11 @@ def eval_neural_lm(eval_data_path):
 
     perplexity = 0
     ### YOUR CODE HERE
-    # Load vocabulary first and define word_to_num (needed before line 111 uses it)
+    # Initialize word_to_num to avoid UnboundLocalError (line 111 uses it before assignment)
+    # This tells Python it's a local variable, preventing the error
+    word_to_num = None
+    
+    # Load vocabulary and define word_to_num properly
     vocab = pd.read_table("data/lm/vocab.ptb.txt",
                           header=None, sep=r"\s+", index_col=0, names=['count', 'freq'])
     vocabsize = 2000
