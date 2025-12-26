@@ -77,9 +77,9 @@ def forward_backward_prop(data, labels, params, dimensions):
     z2 = h @ W2 + b2
     # y_hat = softmax(z2) (M × Dy)
     y_hat = softmax(z2)
-    # cost = -mean(Σ_i labels[i]·log(y_hat[i]))
+    # cost = -sum(Σ_i labels[i]·log(y_hat[i])) (unnormalized, will be normalized in lm_wrapper)
     # Softmax ensures y_hat values are in (0,1), so log is safe
-    cost = -np.mean(np.sum(labels * np.log(y_hat), axis=1))
+    cost = -np.sum(np.sum(labels * np.log(y_hat), axis=1))
     ### END YOUR CODE
 
     ### YOUR CODE HERE: backward propagation
@@ -95,19 +95,18 @@ def forward_backward_prop(data, labels, params, dimensions):
     # delta_z1 = delta_h ⊙ sigmoid_grad(h) (M × H)
     delta_z1 = delta_h * sigmoid_grad(h)
     
-    # Parameter gradients (scaled by 1/M since cost is mean over batch)
-    M = data.shape[0]
+    # Parameter gradients (unnormalized, will be normalized in lm_wrapper)
     # gradW2 = h.T @ delta_theta (H × Dy)
-    gradW2 = (h.T @ delta_theta) / M
+    gradW2 = h.T @ delta_theta
     
     # gradb2 = sum(delta_theta, axis=0) (1 × Dy) - sum over batch
-    gradb2 = np.sum(delta_theta, axis=0, keepdims=True) / M
+    gradb2 = np.sum(delta_theta, axis=0, keepdims=True)
     
     # gradW1 = data.T @ delta_z1 (Dx × H)
-    gradW1 = (data.T @ delta_z1) / M
+    gradW1 = data.T @ delta_z1
     
     # gradb1 = sum(delta_z1, axis=0) (1 × H) - sum over batch
-    gradb1 = np.sum(delta_z1, axis=0, keepdims=True) / M
+    gradb1 = np.sum(delta_z1, axis=0, keepdims=True)
     ### END YOUR CODE
 
     # Stack gradients (do not modify)
