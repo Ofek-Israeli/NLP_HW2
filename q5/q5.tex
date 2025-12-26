@@ -91,4 +91,35 @@ During the model selection process, the following alternatives were also identif
 
 \noindent\textbf{Source:} Hugging Face Model Hub searches for ``t5-small sst2'' and ``flan-t5-small''.
 
+\subsection{Part (e) - Dataset Balance Analysis}
+
+\subsubsection{Is the SST-2 Dataset Balanced?}
+Yes, the SST-2 validation dataset is well-balanced. Our analysis revealed:
+
+\begin{itemize}
+    \item \textbf{Negative examples}: 428 (49.1\%)
+    \item \textbf{Positive examples}: 444 (50.9\%)
+    \item \textbf{Balance ratio}: 0.964 (close to perfect balance of 1.0)
+\end{itemize}
+
+The difference between the two classes is less than 2\%, which indicates excellent balance.
+
+\subsubsection{Why is Dataset Balance Important?}
+Dataset balance is a critical consideration when evaluating model performance with accuracy as the primary metric. With imbalanced datasets, accuracy can be highly misleading. For instance, if a dataset contained 90\% positive examples and only 10\% negative examples, a naive model that always predicts ``positive'' would achieve 90\% accuracy without learning any meaningful patterns about sentiment classification. 
+
+A balanced dataset ensures that the reported accuracy truly reflects the model's ability to distinguish between both classes, rather than merely exploiting the majority class distribution. In the case of SST-2, the near-perfect balance (49.1\% vs 50.9\%) validates that accuracy is a reliable and meaningful metric for evaluating model performance on this task. If the dataset were imbalanced, we would need to consider additional metrics such as precision, recall, F1-score, or per-class accuracy to properly assess model quality.
+
+\subsection{Part (f) - Limitations of Accuracy as an Evaluation Metric}
+
+While accuracy measures whether sentiment predictions are correct, human evaluators would notice several important aspects that this metric overlooks:
+
+\subsubsection{Confidence Calibration}
+Accuracy treats all predictions equally regardless of model confidence. Looking at our model's predictions, it assigns 99.92\% confidence to ``This movie is awesome'' (clearly positive) but 95.77\% to ``Did you like the movie?'' (a neutral question). Both count as ``correct'' if labeled positive, but a human would recognize the second prediction is problematic---the question itself expresses no sentiment.
+
+\subsubsection{Ambiguity and Context}
+The sentence ``I'm not sure what I think about this movie'' was classified as negative with 97.66\% confidence. While this might align with the dataset label, a human evaluator would recognize this as expressing uncertainty rather than negative sentiment. The model's high confidence masks this nuanced interpretation.
+
+\subsubsection{Error Severity}
+Not all misclassifications have equal consequences. Accuracy doesn't distinguish between narrowly missing on borderline cases versus confidently misclassifying obviously opposite sentiments. Human evaluators would weight these errors differently based on their severity and the model's confidence level.
+
 \end{document}
