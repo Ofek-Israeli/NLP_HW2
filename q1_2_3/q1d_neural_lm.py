@@ -92,7 +92,7 @@ def lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions,
     
     # Convert output words to one-hot vectors (vectorized)
     out_word_indices = np.array([out_word_index[idx] for idx in sample_indices])
-    labels = np.zeros((BATCH_SIZE, dimensions[2]))
+    # labels = np.zeros((BATCH_SIZE, dimensions[2]))
     labels[np.arange(BATCH_SIZE), out_word_indices] = 1.0
     
     # Run forward and backward propagation
