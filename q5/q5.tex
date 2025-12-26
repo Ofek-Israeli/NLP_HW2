@@ -1,0 +1,62 @@
+\documentclass[12pt,a4paper]{article}
+% Encoding + Language
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[english]{babel}
+% Math
+\usepackage{amsmath, amsfonts, amssymb, amsthm}
+\usepackage{mathtools}
+% Graphics & Figures
+\usepackage{graphicx}
+\usepackage{float} % allows [H] for figures
+% Page Layout
+\usepackage{geometry}
+\geometry{margin=1in}
+% Colors
+\usepackage{xcolor}
+
+\title{Natural Language Processing - Assignment 2}
+% ---------------------------------------------------------
+
+\begin{document}
+
+\maketitle
+
+\newpage
+
+\section{Question 5: Sentiment Analysis}
+
+\subsection{Part (a) - T5 Paper Research}
+
+\subsubsection{GitHub Repository}
+The GitHub repository for the T5 project is:
+\begin{center}
+\texttt{https://github.com/google-research/text-to-text-transfer-transformer}
+\end{center}
+
+\noindent\textbf{Source:} T5 Paper, page 1, footnote 1.
+
+\subsubsection{Models Made Publicly Available}
+The authors released five pre-trained T5 model variants with different sizes:
+
+\begin{itemize}
+    \item \textbf{T5-Small}: 60 million parameters
+    \item \textbf{T5-Base}: 220 million parameters
+    \item \textbf{T5-Large}: 770 million parameters
+    \item \textbf{T5-3B}: 3 billion parameters
+    \item \textbf{T5-11B}: 11 billion parameters
+\end{itemize}
+
+\noindent\textbf{Source:} GitHub README.md, section ``Released Model Checkpoints''.
+
+\subsubsection{Dataset for Sentiment Analysis Benchmark}
+The dataset used to benchmark sentiment analysis in the T5 paper is \textbf{SST-2 (Stanford Sentiment Treebank-2)}, which is part of the GLUE benchmark suite. SST-2 is a binary sentiment classification task.
+
+\noindent\textbf{Source:} T5 Paper, Section 2.3 ``Downstream Tasks'', GLUE benchmark description.
+
+\subsubsection{Evaluation Metric}
+The evaluation metric used for the sentiment analysis task (SST-2) is \textbf{Accuracy}. The model's predictions are compared against the ground truth labels, and the percentage of correct predictions is reported.
+
+\noindent\textbf{Source:} T5 Paper, Table 1 (results table), column header ``SST-2: Acc''.
+
+\end{document}
