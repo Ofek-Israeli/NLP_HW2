@@ -216,3 +216,31 @@ if __name__ == "__main__":
         print(f"test perplexity : {perplexity}")
     else:
         print("test perplexity will be evaluated only at test time!")
+    
+    # Q3b: Compute perplexity on Wikipedia and Shakespeare texts
+    print("\n" + "="*60)
+    print("Q3b: Perplexity on Wikipedia and Shakespeare texts")
+    print("="*60)
+    
+    if os.path.exists('wikipedia_pos_fromat.txt'):
+        wiki_perplexity = eval_neural_lm('wikipedia_pos_fromat.txt')
+        print(f"Wikipedia text perplexity: {wiki_perplexity:.4f}")
+    else:
+        print("wikipedia_pos_fromat.txt not found")
+        wiki_perplexity = None
+    
+    if os.path.exists('shakespare_pos_fromat.txt'):
+        shakespeare_perplexity = eval_neural_lm('shakespare_pos_fromat.txt')
+        print(f"Shakespearean text perplexity: {shakespeare_perplexity:.4f}")
+    else:
+        print("shakespare_pos_fromat.txt not found")
+        shakespeare_perplexity = None
+    
+    # Print results table
+    print("\nResults Table:")
+    print("-" * 60)
+    print(f"{'Model-Data':<45} {'Wikipedia Text':<20} {'Shakespearean Text':<20}")
+    print("-" * 60)
+    if wiki_perplexity is not None and shakespeare_perplexity is not None:
+        print(f"{'Word-Level Neural Bi-gram (Section 1)':<45} {wiki_perplexity:<20.4f} {shakespeare_perplexity:<20.4f}")
+    print("-" * 60)
