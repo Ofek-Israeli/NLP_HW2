@@ -71,8 +71,7 @@ This model is a T5 small variant that has been fine-tuned on the SST-2 dataset f
 \noindent\textbf{Source:} Hugging Face Model Hub - \texttt{https://huggingface.co/lightsout19/t5-sst2}
 
 \subsection{Part (c) - Sentiment Predictions on Four Sentences}
-
-The model was used to predict sentiment on the following four sentences. The results demonstrate the model's ability to classify sentiment with high confidence:
+The results are in the Jupyter notebook, repeating for convince: 
 
 \begin{center}
 \begin{tabular}{|p{7cm}|c|c|}
@@ -90,69 +89,46 @@ Did you like the movie? & POSITIVE & 0.9577 \\
 \end{tabular}
 \end{center}
 
-\textbf{Observations:}
-\begin{itemize}
-    \item The model correctly identified clear positive sentiment (``This movie is awesome'') with very high confidence (99.92\%).
-    \item The model correctly identified negative sentiment even with negation (``I didn't like the movie so much'') with 98.97\% confidence.
-    \item For ambiguous cases like uncertainty expressions (``I'm not sure what I think''), the model classified it as negative, which may reflect how the training data labeled such uncertain statements.
-    \item Interestingly, the model classified the neutral question ``Did you like the movie?'' as positive, possibly because questions in the training data tended to be associated with positive contexts.
-\end{itemize}
 
 \subsection{Part (d) - Model Evaluation on SST-2 Dataset}
 
-The model was evaluated on the full SST-2 validation dataset consisting of 872 examples. The evaluation results are as follows:
-
-\begin{itemize}
-    \item \textbf{Total examples evaluated}: 872
-    \item \textbf{Correct predictions}: [To be filled after running evaluation]
-    \item \textbf{Accuracy}: [To be filled after running evaluation]\%
-\end{itemize}
-
-\textbf{Note:} The actual accuracy should be reported here after running the evaluation code in the Jupyter notebook. Based on the model card on Hugging Face, T5-Small fine-tuned models on SST-2 typically achieve accuracy in the range of 91-93\%.
-
+We evaluated the model on the SST-2 validation dataset of 872 examples. The model achieved 90.14\% accuracy, correctly classifying 786 out of 872 examples. 
 \subsection{Part (e) - Dataset Balance Analysis}
 
 \subsubsection{Is the SST-2 Dataset Balanced?}
-Yes, the SST-2 validation dataset is well-balanced. Our analysis revealed:
-
-\begin{itemize}
-    \item \textbf{Negative examples}: 428 (49.1\%)
-    \item \textbf{Positive examples}: 444 (50.9\%)
-    \item \textbf{Balance ratio}: 0.964 (close to perfect balance of 1.0)
-\end{itemize}
-
-The difference between the two classes is less than 2\%, which indicates excellent balance.
+The SST-2 GLUE set is balanced, with 29780 negative examples (44.2\%) and 37569 positive examples (55.8\%) a balance ratio of 0.793. Which seems fairly well balanced. It appears the researchers have built the dataset to be balanced, as it is likely real distribution skews to a certain side more significantly.
 
 \subsubsection{Why is Dataset Balance Important?}
-Dataset balance is a critical consideration when evaluating model performance with accuracy as the primary metric. With imbalanced datasets, accuracy can be highly misleading. For instance, if a dataset contained 90\% positive examples and only 10\% negative examples, a naive model that always predicts ``positive'' would achieve 90\% accuracy without learning any meaningful patterns about sentiment classification. 
-
-A balanced dataset ensures that the reported accuracy truly reflects the model's ability to distinguish between both classes, rather than merely exploiting the majority class distribution. In the case of SST-2, the near-perfect balance (49.1\% vs 50.9\%) validates that accuracy is a reliable and meaningful metric for evaluating model performance on this task. If the dataset were imbalanced, we would need to consider additional metrics such as precision, recall, F1-score, or per-class accuracy to properly assess model quality.
+Let us consider a hypothetical imbalanced dataset with 90\% positive and 10\% negative examples. A trivial classifier that always predicts ``positive'' would achieve 90\% accuracy despite not being 'intelligent' what so ever. 
+\\
+With SST-2's balanced distribution, our 90.14\% accuracy genuinely reflects the model's classification ability rather than dataset bias. Therefore, the dataset balance is very important in this case as without it bad classifiers can achieve good results, rendering the evaluation objectively poor.
 
 \subsection{Part (f) - Limitations of Accuracy as an Evaluation Metric}
 
 While accuracy measures whether sentiment predictions are correct, human evaluators would notice several important aspects that this metric overlooks:
 
-\subsubsection{Confidence Calibration}
-Accuracy treats all predictions equally regardless of model confidence. Looking at our model's predictions, it assigns 99.92\% confidence to ``This movie is awesome'' (clearly positive) but 95.77\% to ``Did you like the movie?'' (a neutral question). Both count as ``correct'' if labeled positive, but a human would recognize the second prediction is problematic---the question itself expresses no sentiment.
+\begin{enumerate}
+    \item \textbf{Confidence Calibration:} Accuracy treats all predictions equally regardless of model confidence. Our model assigns 99.92\% confidence to ``This movie is awesome'' (clearly positive) but 95.77\% to ``Did you like the movie?'' (a neutral question). Both count as correct, yet humans recognize the question expresses no inherent sentiment.
+    
+    \item \textbf{Ambiguity and Context:} The sentence ``I'm not sure what I think about this movie'' was classified as negative with 97.66\% confidence. While this might match the label, humans recognize this expresses uncertainty rather than actual negative sentiment---a distinction the model's high confidence masks.
+    
+    \item \textbf{Error Severity:} Not all misclassifications have equal consequences. Accuracy doesn't distinguish between narrowly missing borderline cases versus confidently misclassifying clear-cut examples. Human evaluators naturally weight these errors differently based on severity and confidence level.
+\end{enumerate}
 
-\subsubsection{Ambiguity and Context}
-The sentence ``I'm not sure what I think about this movie'' was classified as negative with 97.66\% confidence. While this might align with the dataset label, a human evaluator would recognize this as expressing uncertainty rather than negative sentiment. The model's high confidence masks this nuanced interpretation.
 
-\subsubsection{Error Severity}
-Not all misclassifications have equal consequences. Accuracy doesn't distinguish between narrowly missing on borderline cases versus confidently misclassifying obviously opposite sentiments. Human evaluators would weight these errors differently based on their severity and the model's confidence level.
+\subsection{Part (g) - Consulting for Healthcare Sentiment Analysis}
 
-\subsection{Part (g) - Consulting Advice for Healthcare Sentiment Analysis}
+\textbf{Three Approaches:}
+\\
+\textbf{1. Use an Existing Sentiment Model:} Deploy the current SST-2 model directly or a similar model. Our 90.14\% accuracy shows the model works well on movie reviews, but medical summaries differ significantly in vocabulary and structure. Our results reveal concerning patterns: ``I'm not sure what I think about this movie'' was classified as negative with 97.66\% confidence, showing the model treats uncertainty as negativity which may be problematic for medical contexts where uncertainty is common.
+\\
+\textbf{2. Fine-tune on Labeled Medical Data:} 
+Collect 500--1000 annotated patient visit summaries and fine-tune T5 or a medical domain model (For example BioBERT). The T5 paper (Section 3.7.2) showed domain-specific pre-training improved performance on in-domain tasks. However, annotation and development requires expertise and will likely be more costly and have a higher development time.
+\\
+\textbf{3. LLM Prompting:} Use GPT-4 or a similar LLM model with 5-10 example summaries in the prompt. No training required, but raises HIPAA compliance issues for patient data sent to external APIs. Consider local deployment for sensitive data. Running LLM models can also be costly and requires significant infrastructure if ran locally. Another downside is the unpredictably of LLM models, before deployment the LLM suitability and performance needs to be rigorously tested.
+\\
+\textbf{Recommendation:} Test approach 1 on 100 samples first to quantify domain mismatch. If performance is inadequate, invest in approach 2 with emphasis on per-supplier error analysis, not just overall accuracy. Alternatively Consider testing LLM models performance if they are tested adequate consistently and there is sufficient local infrastructure consider using them.
 
-Your challenge is applying sentiment analysis to medical visit summaries, which is quite different from the movie reviews we've been working with. Here are three practical approaches:
-
-\textbf{Start Simple---Test Existing Models.} Try the SST-2 model we used as a quick baseline. It probably won't work great since medical language differs from casual text, but it'll show you the gap and costs nothing to try.
-
-\textbf{Fine-tune on Your Data.} Take a model like T5-Small or BioBERT and train it on labeled examples from your visit summaries. You'll need to manually label maybe 200--500 examples first. This gives the best performance but requires time and ML expertise.
-
-\textbf{Use LLMs with Few Examples.} Tools like GPT-4 can classify sentiment with just a few example visit summaries in the prompt. Quick to set up, but raises privacy concerns with patient data and has ongoing API costs.
-
-\textbf{Key factors to consider:} Make sure your dataset is balanced between both suppliers and positive/negative visits---otherwise accuracy metrics are meaningless (as we saw in Part e). Think about privacy: can you use cloud APIs with medical data, or do you need on-premises solutions? Also, who labels the ``ground truth''---different doctors might judge satisfaction differently.
-
-\textbf{My recommendation:} Start with approach 1 to see how bad the domain gap is. Then label 100--200 examples and try approach 2 or 3. Don't just look at accuracy---check if the model catches negative experiences equally well for both suppliers, since missing drug problems is worse than false alarms.
+\end{document}
 
 \end{document}
