@@ -33,8 +33,7 @@ The GitHub repository for the T5 project is:
 \begin{center}
 \texttt{https://github.com/google-research/text-to-text-transfer-transformer}
 \end{center}
-
-\noindent\textbf{Source:} T5 Paper, page 1, footnote 1.
+The repository was cloned locally. 
 
 \subsubsection{Models Made Publicly Available}
 The authors released five pre-trained T5 model variants with different sizes:
@@ -52,12 +51,12 @@ The authors released five pre-trained T5 model variants with different sizes:
 \subsubsection{Dataset for Sentiment Analysis Benchmark}
 The dataset used to benchmark sentiment analysis in the T5 paper is \textbf{SST-2 (Stanford Sentiment Treebank-2)}, which is part of the GLUE benchmark suite. SST-2 is a binary sentiment classification task.
 
-\noindent\textbf{Source:} T5 Paper, Section 2.3 ``Downstream Tasks'', GLUE benchmark description.
+\noindent\textbf{Source:} T5 Paper, Section 2.3 ``Downstream Tasks'', GLUE benchmark description. It shows all the different benchmarks used. 
 
 \subsubsection{Evaluation Metric}
 The evaluation metric used for the sentiment analysis task (SST-2) is \textbf{Accuracy}. The model's predictions are compared against the ground truth labels, and the percentage of correct predictions is reported.
 
-\noindent\textbf{Source:} T5 Paper, Table 1 (results table), column header ``SST-2: Acc''.
+\noindent\textbf{Source:} T5 Paper, Various tables showing SST-2 being evaluated based on accuracy, column header ``SST-2: Acc''.
 
 \subsection{Part (b) - T5-Small Model Fine-tuned on SST2}
 
@@ -67,29 +66,49 @@ The selected model for this assignment is:
 \textbf{\texttt{lightsout19/t5-sst2}}
 \end{center}
 
-This model is a T5 variant that has been fine-tuned on the SST-2 dataset for sentiment classification.
+This model is a T5 small variant that has been fine-tuned on the SST-2 dataset for sentiment classification.
 
 \noindent\textbf{Source:} Hugging Face Model Hub - \texttt{https://huggingface.co/lightsout19/t5-sst2}
 
-\subsubsection{Model Details}
+\subsection{Part (c) - Sentiment Predictions on Four Sentences}
+
+The model was used to predict sentiment on the following four sentences. The results demonstrate the model's ability to classify sentiment with high confidence:
+
+\begin{center}
+\begin{tabular}{|p{7cm}|c|c|}
+\hline
+\textbf{Sentence} & \textbf{Prediction} & \textbf{Confidence} \\
+\hline
+This movie is awesome & POSITIVE & 0.9992 \\
+\hline
+I didn't like the movie so much & NEGATIVE & 0.9897 \\
+\hline
+I'm not sure what I think about this movie. & NEGATIVE & 0.9766 \\
+\hline
+Did you like the movie? & POSITIVE & 0.9577 \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Observations:}
 \begin{itemize}
-    \item \textbf{Base Architecture}: T5 (Text-to-Text Transfer Transformer)
-    \item \textbf{Fine-tuning Dataset}: SST-2 (Stanford Sentiment Treebank-2)
-    \item \textbf{Task}: Binary sentiment classification
-    \item \textbf{Framework}: Transformers library (PyTorch/TensorFlow compatible)
-    \item \textbf{Usage}: Can be loaded using \texttt{AutoTokenizer} and \texttt{AutoModelForSequenceClassification}
+    \item The model correctly identified clear positive sentiment (``This movie is awesome'') with very high confidence (99.92\%).
+    \item The model correctly identified negative sentiment even with negation (``I didn't like the movie so much'') with 98.97\% confidence.
+    \item For ambiguous cases like uncertainty expressions (``I'm not sure what I think''), the model classified it as negative, which may reflect how the training data labeled such uncertain statements.
+    \item Interestingly, the model classified the neutral question ``Did you like the movie?'' as positive, possibly because questions in the training data tended to be associated with positive contexts.
 \end{itemize}
 
-\subsubsection{Alternative Models Considered}
-During the model selection process, the following alternatives were also identified:
+\subsection{Part (d) - Model Evaluation on SST-2 Dataset}
 
-\begin{enumerate}
-    \item \textbf{\texttt{hyyoka/t5-small-finetuned-sst2}}: A T5-Small model (60.5M parameters) specifically fine-tuned on SST-2. This model exactly matches the T5-Small size specification.
-    
-    \item \textbf{\texttt{google/flan-t5-small}}: An improved version of T5-Small (77M parameters) that has been instruction fine-tuned on 1000+ tasks. While not specifically fine-tuned on SST-2, FLAN-T5 shows improved performance across many NLP tasks including sentiment analysis.
-\end{enumerate}
+The model was evaluated on the full SST-2 validation dataset consisting of 872 examples. The evaluation results are as follows:
 
-\noindent\textbf{Source:} Hugging Face Model Hub searches for ``t5-small sst2'' and ``flan-t5-small''.
+\begin{itemize}
+    \item \textbf{Total examples evaluated}: 872
+    \item \textbf{Correct predictions}: [To be filled after running evaluation]
+    \item \textbf{Accuracy}: [To be filled after running evaluation]\%
+\end{itemize}
+
+\textbf{Note:} The actual accuracy should be reported here after running the evaluation code in the Jupyter notebook. Based on the model card on Hugging Face, T5-Small fine-tuned models on SST-2 typically achieve accuracy in the range of 91-93\%.
 
 \subsection{Part (e) - Dataset Balance Analysis}
 
@@ -121,5 +140,19 @@ The sentence ``I'm not sure what I think about this movie'' was classified as ne
 
 \subsubsection{Error Severity}
 Not all misclassifications have equal consequences. Accuracy doesn't distinguish between narrowly missing on borderline cases versus confidently misclassifying obviously opposite sentiments. Human evaluators would weight these errors differently based on their severity and the model's confidence level.
+
+\subsection{Part (g) - Consulting Advice for Healthcare Sentiment Analysis}
+
+Your challenge is applying sentiment analysis to medical visit summaries, which is quite different from the movie reviews we've been working with. Here are three practical approaches:
+
+\textbf{Start Simple---Test Existing Models.} Try the SST-2 model we used as a quick baseline. It probably won't work great since medical language differs from casual text, but it'll show you the gap and costs nothing to try.
+
+\textbf{Fine-tune on Your Data.} Take a model like T5-Small or BioBERT and train it on labeled examples from your visit summaries. You'll need to manually label maybe 200--500 examples first. This gives the best performance but requires time and ML expertise.
+
+\textbf{Use LLMs with Few Examples.} Tools like GPT-4 can classify sentiment with just a few example visit summaries in the prompt. Quick to set up, but raises privacy concerns with patient data and has ongoing API costs.
+
+\textbf{Key factors to consider:} Make sure your dataset is balanced between both suppliers and positive/negative visits---otherwise accuracy metrics are meaningless (as we saw in Part e). Think about privacy: can you use cloud APIs with medical data, or do you need on-premises solutions? Also, who labels the ``ground truth''---different doctors might judge satisfaction differently.
+
+\textbf{My recommendation:} Start with approach 1 to see how bad the domain gap is. Then label 100--200 examples and try approach 2 or 3. Don't just look at accuracy---check if the model catches negative experiences equally well for both suppliers, since missing drug problems is worse than false alarms.
 
 \end{document}

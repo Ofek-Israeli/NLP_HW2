@@ -1,10 +1,9 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.20)  26 DEC 2025 22:28
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (TeX Live 2025) (preloaded format=pdflatex 2025.12.20)  27 DEC 2025 12:01
 entering extended mode
  restricted \write18 enabled.
- file:line:error style messages enabled.
  %&-line parsing enabled.
-**/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex
-(/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex
+**q5.tex
+(./q5.tex
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-14>
 (/Users/talweiss/Library/TinyTeX/texmf-dist/tex/latex/base/article.cls
@@ -302,31 +301,26 @@ LaTeX Warning: No \author given.
 
 {/Users/talweiss/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
 LaTeX Font Info:    Font shape `T1/cmtt/bx/n' in size <12> not available
-(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 67.
- [2]
-Overfull \hbox (37.37134pt too wide) in paragraph at lines 80--81
-[]\T1/cmr/bx/n/12 Usage\T1/cmr/m/n/12 : Can be loaded us-ing \T1/cmtt/m/n/12 AutoTokenizer \T1/cmr/m/n/12 and \T1/cmtt/m/n/12 AutoModelForSequenceClassification 
- []
-
-[3] [4] (./q5.aux)
+(Font)              Font shape `T1/cmtt/m/n' tried instead on input line 66.
+ [2] [3] [4] [5] (./q5.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-11-14>
  ***********
  ) 
 Here is how much of TeX's memory you used:
- 5408 strings out of 469476
- 84891 string characters out of 5467623
- 510623 words of memory out of 5000000
- 34009 multiletter control sequences out of 15000+600000
- 636668 words of font info for 61 fonts, out of 8000000 for 9000
+ 5429 strings out of 469476
+ 84982 string characters out of 5467623
+ 513623 words of memory out of 5000000
+ 34024 multiletter control sequences out of 15000+600000
+ 641015 words of font info for 78 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 57i,6n,65p,594b,218s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 57i,8n,65p,559b,227s stack positions out of 10000i,1000n,20000p,200000b,200000s
  </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1200.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1200.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1440.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecbx1728.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1200.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm1440.600pk> </Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/ecrm2074.600pk>
-Output written on q5.pdf (4 pages, 84673 bytes).
+Output written on q5.pdf (5 pages, 88959 bytes).
 PDF statistics:
- 299 PDF objects out of 1000 (max. 8388607)
- 42 compressed objects within 1 object stream
+ 306 PDF objects out of 1000 (max. 8388607)
+ 44 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 
