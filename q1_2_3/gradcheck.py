@@ -80,7 +80,43 @@ def your_gradcheck_test():
     """
     print("Running your sanity checks...")
     ### YOUR OPTIONAL CODE HERE
-    pass
+    # Test 1: Linear function f(x) = a^T x + b
+    # For a fixed vector a and scalar b, gradient is a
+    a = np.array([1.5, -2.3, 0.7, 3.1])
+    b = 5.0
+    linear_func = lambda x: (np.dot(a, x) + b, a)
+    gradcheck_naive(linear_func, np.random.randn(4,), "linear function")
+    
+    # Test 2: Exponential function f(x) = sum(exp(x))
+    # Gradient is exp(x) (element-wise)
+    exp_func = lambda x: (np.sum(np.exp(x)), np.exp(x))
+    gradcheck_naive(exp_func, np.random.randn(5,), "exponential function")
+    
+    # Test 3: Product function f(x) = prod(x) = product of all elements
+    # Gradient: for each element i, gradient[i] = prod(x) / x[i]
+    def product_func(x):
+        prod = np.prod(x)
+        grad = np.zeros_like(x)
+        for i in range(len(x)):
+            grad[i] = prod / x[i]
+        return prod, grad
+    gradcheck_naive(product_func, np.random.randn(4,) + 1.0, "product function")  # +1 to avoid zeros
+    
+    # Test 4: Sum of squares function f(x) = sum(x^2)
+    # Gradient is 2*x
+    sum_squares = lambda x: (np.sum(x ** 2), 2 * x)
+    gradcheck_naive(sum_squares, np.random.randn(3, 2), "sum of squares (2D)")
+    
+    # Test 5: Edge case - very small values
+    # Using sum of squares function
+    small_vals = np.array([1e-8, 1e-9, 1e-10])
+    gradcheck_naive(sum_squares, small_vals, "very small values")
+    
+    # Test 6: Edge case - mixed positive and negative values (no zero to avoid issues)
+    mixed_vals = np.array([-5.0, 0.001, 5.0, -0.001, 0.001])
+    gradcheck_naive(sum_squares, mixed_vals, "mixed positive/negative values")
+    
+    print()
     ### END YOUR CODE
 
 

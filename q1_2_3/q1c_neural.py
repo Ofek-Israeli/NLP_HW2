@@ -28,7 +28,16 @@ def forward(data, label, params, dimensions):
 
     # Compute the probability
     ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    # z1 = data @ W1 + b1 (1 × H)
+    z1 = data @ W1 + b1
+    # h = sigmoid(z1) (1 × H)
+    h = sigmoid(z1)
+    # z2 = h @ W2 + b2 (1 × Dy)
+    z2 = h @ W2 + b2
+    # y_hat = softmax(z2) (1 × Dy)
+    y_hat = softmax(z2)
+    # Return probability of correct label
+    return y_hat[0, label]
     ### END YOUR CODE
 
 
@@ -60,11 +69,44 @@ def forward_backward_prop(data, labels, params, dimensions):
     b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
 
     ### YOUR CODE HERE: forward propagation
-    raise NotImplementedError
+    # z1 = data @ W1 + b1 (M × H) - broadcasting b1
+    z1 = data @ W1 + b1
+    # h = sigmoid(z1) (M × H)
+    h = sigmoid(z1)
+    # z2 = h @ W2 + b2 (M × Dy) - broadcasting b2
+    z2 = h @ W2 + b2
+    # y_hat = softmax(z2) (M × Dy)
+    y_hat = softmax(z2)
+    # cost = -sum(Σ_i labels[i]·log(y_hat[i])) (unnormalized, will be normalized in lm_wrapper)
+    # Softmax ensures y_hat values are in (0,1), so log is safe
+    cost = -np.sum(np.sum(labels * np.log(y_hat), axis=1))
     ### END YOUR CODE
 
     ### YOUR CODE HERE: backward propagation
-    raise NotImplementedError
+    # From Q1a: gradient w.r.t. softmax input
+    # delta_theta = y_hat - labels (M × Dy)
+    delta_theta = y_hat - labels
+    
+    # From Q1b: gradient w.r.t. hidden layer output
+    # delta_h = delta_theta @ W2.T (M × H)
+    delta_h = delta_theta @ W2.T
+    
+    # Gradient w.r.t. hidden layer input (before sigmoid)
+    # delta_z1 = delta_h ⊙ sigmoid_grad(h) (M × H)
+    delta_z1 = delta_h * sigmoid_grad(h)
+    
+    # Parameter gradients (unnormalized, will be normalized in lm_wrapper)
+    # gradW2 = h.T @ delta_theta (H × Dy)
+    gradW2 = h.T @ delta_theta
+    
+    # gradb2 = sum(delta_theta, axis=0) (1 × Dy) - sum over batch
+    gradb2 = np.sum(delta_theta, axis=0, keepdims=True)
+    
+    # gradW1 = data.T @ delta_z1 (Dx × H)
+    gradW1 = data.T @ delta_z1
+    
+    # gradb1 = sum(delta_z1, axis=0) (1 × H) - sum over batch
+    gradb1 = np.sum(delta_z1, axis=0, keepdims=True)
     ### END YOUR CODE
 
     # Stack gradients (do not modify)
