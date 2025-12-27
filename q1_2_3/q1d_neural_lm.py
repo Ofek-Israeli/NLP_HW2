@@ -14,8 +14,6 @@ VOCAB_EMBEDDING_PATH = "data/lm/vocab.embeddings.glove.txt"
 BATCH_SIZE = 50
 NUM_OF_SGD_ITERATIONS = 40000
 LEARNING_RATE = 0.3
-# Set to False to skip training and only run evaluation (uses saved_params_40000.npy)
-TRAIN_MODEL = False
 
 
 def load_vocab_embeddings(path=VOCAB_EMBEDDING_PATH):
@@ -155,17 +153,49 @@ def eval_neural_lm(eval_data_path):
     output_dim = vocabsize
     dimensions = [input_dim, hidden_dim, output_dim]
     
-    # Compute perplexity
+    # Compute perplexity (vectorized using batches)
+    from softmax import softmax
+    from sigmoid import sigmoid
+    
+    # Unpack network parameters
+    ofs = 0
+    Dx, H, Dy = (dimensions[0], dimensions[1], dimensions[2])
+    W1 = np.reshape(params[ofs:ofs + Dx * H], (Dx, H))
+    ofs += Dx * H
+    b1 = np.reshape(params[ofs:ofs + H], (1, H))
+    ofs += H
+    W2 = np.reshape(params[ofs:ofs + H * Dy], (H, Dy))
+    ofs += H * Dy
+    b2 = np.reshape(params[ofs:ofs + Dy], (1, Dy))
+    
+    # Process in batches for efficiency
+    batch_size = 1000
     log_probs = 0.0
-    for i in range(num_of_examples):
-        # Get GloVe embedding for input word
-        embedding = np.array(num_to_word_embedding[in_word_index[i]])
-        # Reshape to (1, 50) for forward pass
-        data = embedding.reshape(1, -1)
-        # Get probability of correct word
-        prob = forward(data, out_word_index[i], params, dimensions)
-        # Accumulate log probability (add small epsilon to avoid log(0))
-        log_probs += np.log(prob + 1e-10)
+    
+    for batch_start in range(0, num_of_examples, batch_size):
+        batch_end = min(batch_start + batch_size, num_of_examples)
+        batch_indices = range(batch_start, batch_end)
+        batch_size_actual = batch_end - batch_start
+        
+        # Vectorized: get embeddings for batch (batch_size_actual x Dx)
+        batch_embeddings = np.array([num_to_word_embedding[in_word_index[i]] for i in batch_indices])
+        
+        # Vectorized forward propagation
+        # z1 = batch_embeddings @ W1 + b1 (batch_size_actual x H) - broadcasting b1
+        z1 = batch_embeddings @ W1 + b1
+        # h = sigmoid(z1) (batch_size_actual x H)
+        h = sigmoid(z1)
+        # z2 = h @ W2 + b2 (batch_size_actual x Dy) - broadcasting b2
+        z2 = h @ W2 + b2
+        # y_hat = softmax(z2) (batch_size_actual x Dy)
+        y_hat = softmax(z2.copy())  # softmax modifies in-place, so use copy
+        
+        # Extract probabilities of correct labels using advanced indexing
+        batch_labels = np.array([out_word_index[i] for i in batch_indices])
+        batch_probs = y_hat[np.arange(batch_size_actual), batch_labels]
+        
+        # Accumulate log probabilities (add small epsilon to avoid log(0))
+        log_probs += np.sum(np.log(batch_probs + 1e-10))
     
     # Calculate perplexity: exp(-1/M * sum(log(p(correct_word))))
     perplexity = np.exp(-log_probs / num_of_examples)
@@ -177,46 +207,42 @@ def eval_neural_lm(eval_data_path):
 if __name__ == "__main__":
     # Load the vocabulary
     vocab = pd.read_table("data/lm/vocab.ptb.txt",
-                          header=None, sep=r"\s+", index_col=0, names=['count', 'freq'], )
+                          header=None, sep="\s+", index_col=0, names=['count', 'freq'], )
 
     vocabsize = 2000
     num_to_word = dict(enumerate(vocab.index[:vocabsize]))
     num_to_word_embedding = load_vocab_embeddings()
     word_to_num = utils.invert_dict(num_to_word)
 
-    # Training section (can be skipped if TRAIN_MODEL is False)
-    if TRAIN_MODEL:
-        # Load the training data
-        _, S_train = load_data_as_sentences('data/lm/ptb-train.txt', word_to_num)
-        in_word_index, out_word_index = convert_to_lm_dataset(S_train)
-        assert len(in_word_index) == len(out_word_index)
-        num_of_examples = len(in_word_index)
+    # Load the training data
+    _, S_train = load_data_as_sentences('data/lm/ptb-train.txt', word_to_num)
+    in_word_index, out_word_index = convert_to_lm_dataset(S_train)
+    assert len(in_word_index) == len(out_word_index)
+    num_of_examples = len(in_word_index)
 
-        random.seed(31415)
-        np.random.seed(9265)
-        in_word_index, out_word_index = shuffle_training_data(in_word_index, out_word_index)
-        startTime = time.time()
+    random.seed(31415)
+    np.random.seed(9265)
+    in_word_index, out_word_index = shuffle_training_data(in_word_index, out_word_index)
+    startTime = time.time()
 
-        # Training should happen here
-        # Initialize parameters randomly
-        # Construct the params
-        input_dim = 50
-        hidden_dim = 50
-        output_dim = vocabsize
-        dimensions = [input_dim, hidden_dim, output_dim]
-        params = np.random.randn((input_dim + 1) * hidden_dim + (
-            hidden_dim + 1) * output_dim, )
-        print(f"#params: {len(params)}")
-        print(f"#train examples: {num_of_examples}")
+    # Training should happen here
+    # Initialize parameters randomly
+    # Construct the params
+    input_dim = 50
+    hidden_dim = 50
+    output_dim = vocabsize
+    dimensions = [input_dim, hidden_dim, output_dim]
+    params = np.random.randn((input_dim + 1) * hidden_dim + (
+        hidden_dim + 1) * output_dim, )
+    print(f"#params: {len(params)}")
+    print(f"#train examples: {num_of_examples}")
 
-        # run SGD
-        params = sgd(
-                lambda vec: lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions, vec),
-                params, LEARNING_RATE, NUM_OF_SGD_ITERATIONS, None, True, 1000)
+    # run SGD
+    params = sgd(
+            lambda vec: lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions, vec),
+            params, LEARNING_RATE, NUM_OF_SGD_ITERATIONS, None, True, 1000)
 
-        print(f"training took {time.time() - startTime} seconds")
-    else:
-        print("Skipping training (TRAIN_MODEL = False). Using saved parameters for evaluation.")
+    print(f"training took {time.time() - startTime} seconds")
 
     # Evaluate perplexity with dev-data
     perplexity = eval_neural_lm('data/lm/ptb-dev.txt')
