@@ -20,7 +20,7 @@ def docs_to_indices(docs, word_to_num):
 
 def load_dataset(fname):
     docs = []
-    with open(fname, encoding='utf-8') as fd:
+    with open(fname) as fd:
         cur = []
         for line in fd:
             # new sentence on -DOCSTART- or blank line
