@@ -14,6 +14,8 @@ VOCAB_EMBEDDING_PATH = "data/lm/vocab.embeddings.glove.txt"
 BATCH_SIZE = 50
 NUM_OF_SGD_ITERATIONS = 40000
 LEARNING_RATE = 0.3
+# Set to False to skip training and only run evaluation (uses saved_params_40000.npy)
+TRAIN_MODEL = False
 
 
 def load_vocab_embeddings(path=VOCAB_EMBEDDING_PATH):
@@ -132,7 +134,13 @@ def eval_neural_lm(eval_data_path):
     from sgd import load_saved_params
     
     # Try to load saved params, or use the most recent one
-    _, params, _ = load_saved_params()
+    # Wrap in try-except in case pickle file is missing (we only need .npy file for evaluation)
+    try:
+        _, params, _ = load_saved_params()
+    except (FileNotFoundError, IOError):
+        # If pickle file is missing, try to load saved_params_40000.npy directly
+        params = None
+    
     if params is None:
         # If no saved params, try to load saved_params_40000.npy directly
         if os.path.exists('saved_params_40000.npy'):
@@ -169,42 +177,46 @@ def eval_neural_lm(eval_data_path):
 if __name__ == "__main__":
     # Load the vocabulary
     vocab = pd.read_table("data/lm/vocab.ptb.txt",
-                          header=None, sep="\s+", index_col=0, names=['count', 'freq'], )
+                          header=None, sep=r"\s+", index_col=0, names=['count', 'freq'], )
 
     vocabsize = 2000
     num_to_word = dict(enumerate(vocab.index[:vocabsize]))
     num_to_word_embedding = load_vocab_embeddings()
     word_to_num = utils.invert_dict(num_to_word)
 
-    # Load the training data
-    _, S_train = load_data_as_sentences('data/lm/ptb-train.txt', word_to_num)
-    in_word_index, out_word_index = convert_to_lm_dataset(S_train)
-    assert len(in_word_index) == len(out_word_index)
-    num_of_examples = len(in_word_index)
+    # Training section (can be skipped if TRAIN_MODEL is False)
+    if TRAIN_MODEL:
+        # Load the training data
+        _, S_train = load_data_as_sentences('data/lm/ptb-train.txt', word_to_num)
+        in_word_index, out_word_index = convert_to_lm_dataset(S_train)
+        assert len(in_word_index) == len(out_word_index)
+        num_of_examples = len(in_word_index)
 
-    random.seed(31415)
-    np.random.seed(9265)
-    in_word_index, out_word_index = shuffle_training_data(in_word_index, out_word_index)
-    startTime = time.time()
+        random.seed(31415)
+        np.random.seed(9265)
+        in_word_index, out_word_index = shuffle_training_data(in_word_index, out_word_index)
+        startTime = time.time()
 
-    # Training should happen here
-    # Initialize parameters randomly
-    # Construct the params
-    input_dim = 50
-    hidden_dim = 50
-    output_dim = vocabsize
-    dimensions = [input_dim, hidden_dim, output_dim]
-    params = np.random.randn((input_dim + 1) * hidden_dim + (
-        hidden_dim + 1) * output_dim, )
-    print(f"#params: {len(params)}")
-    print(f"#train examples: {num_of_examples}")
+        # Training should happen here
+        # Initialize parameters randomly
+        # Construct the params
+        input_dim = 50
+        hidden_dim = 50
+        output_dim = vocabsize
+        dimensions = [input_dim, hidden_dim, output_dim]
+        params = np.random.randn((input_dim + 1) * hidden_dim + (
+            hidden_dim + 1) * output_dim, )
+        print(f"#params: {len(params)}")
+        print(f"#train examples: {num_of_examples}")
 
-    # run SGD
-    params = sgd(
-            lambda vec: lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions, vec),
-            params, LEARNING_RATE, NUM_OF_SGD_ITERATIONS, None, True, 1000)
+        # run SGD
+        params = sgd(
+                lambda vec: lm_wrapper(in_word_index, out_word_index, num_to_word_embedding, dimensions, vec),
+                params, LEARNING_RATE, NUM_OF_SGD_ITERATIONS, None, True, 1000)
 
-    print(f"training took {time.time() - startTime} seconds")
+        print(f"training took {time.time() - startTime} seconds")
+    else:
+        print("Skipping training (TRAIN_MODEL = False). Using saved parameters for evaluation.")
 
     # Evaluate perplexity with dev-data
     perplexity = eval_neural_lm('data/lm/ptb-dev.txt')
