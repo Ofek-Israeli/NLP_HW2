@@ -1,5 +1,5 @@
 # Fdb version 4
-["pdflatex"] 1766834628.77214 "/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex" "q5.pdf" "q5" 1766834629.03687 0
+["pdflatex"] 1766835542.87225 "/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex" "q5.pdf" "q5" 1766835543.10036 0
   "/Users/talweiss/Library/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecbx1200.tfm" 1136768653 3584 402da0b29eafbad07963b1224b222f18 ""
   "/Users/talweiss/Library/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecbx1440.tfm" 1136768653 3584 13049b61b922a28b158a38aeff75ee9b ""
   "/Users/talweiss/Library/TinyTeX/texmf-dist/fonts/tfm/jknappen/ec/ecbx1728.tfm" 1136768653 3584 ad49a18d8515beef6d92d4d3f197d0fd ""
@@ -75,9 +75,9 @@
   "/Users/talweiss/Library/TinyTeX/texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1200.600pk" 1766780008.23552 14040 0fa1f2de2a2245d98b4967bb95584c24 ""
   "/Users/talweiss/Library/TinyTeX/texmf-var/web2c/pdftex/pdflatex.fmt" 1766231405 2285645 e90a15696cdf6da962a5abcfe51fa8b8 ""
   "/Users/talweiss/Library/TinyTeX/texmf.cnf" 1766115583 637 edd806fb06a89761a6034e1968af9017 ""
-  "/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex" 1766834628.5904 7434 41d688eeb129a0ff7967a6de91f39492 ""
-  "q5.aux" 1766834628.99177 2100 db371e3ba2756ef4906788f150ed7392 "pdflatex"
-  "q5.tex" 1766834628.5904 7434 41d688eeb129a0ff7967a6de91f39492 ""
+  "/Users/talweiss/Per/NLP/NLP_HW2/q5/q5.tex" 1766835542.67242 7310 f2dd6d8dacaafc87a64534e72ed46f8e ""
+  "q5.aux" 1766835543.05807 2100 db371e3ba2756ef4906788f150ed7392 "pdflatex"
+  "q5.tex" 1766835542.67242 7310 f2dd6d8dacaafc87a64534e72ed46f8e ""
   (generated)
   "q5.aux"
   "q5.log"

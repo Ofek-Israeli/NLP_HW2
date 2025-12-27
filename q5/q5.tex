@@ -105,14 +105,14 @@ With SST-2's balanced distribution, our 90.14\% accuracy genuinely reflects the 
 
 \subsection{Part (f) - Limitations of Accuracy as an Evaluation Metric}
 
-While accuracy measures whether sentiment predictions are correct, human evaluators would notice several important aspects that this metric overlooks:
+When evaluating sentiment predictions, human evaluators notice properties beyond correctness that accuracy doesn't measure:
 
 \begin{enumerate}
-    \item \textbf{Confidence Calibration:} Accuracy treats all predictions equally regardless of model confidence. Our model assigns 99.92\% confidence to ``This movie is awesome'' (clearly positive) but 95.77\% to ``Did you like the movie?'' (a neutral question). Both count as correct, yet humans recognize the question expresses no inherent sentiment.
+    \item \textbf{Confidence Appropriateness:} Humans check if confidence matches prediction difficulty. Our model gives 95.77\% confidence to ``Did you like the movie?'' (a question with no sentiment), similar to clearly positive cases. Accuracy ignores whether high confidence is justified.
     
-    \item \textbf{Ambiguity and Context:} The sentence ``I'm not sure what I think about this movie'' was classified as negative with 97.66\% confidence. While this might match the label, humans recognize this expresses uncertainty rather than actual negative sentiment---a distinction the model's high confidence masks.
+    \item \textbf{Error Patterns and Consistency:} Humans notice when similar inputs get inconsistent predictions (e.g., ``I liked it'' vs ``I really liked it''). Accuracy evaluates each example independently, missing systematic inconsistencies that suggest the model doesn't truly understand sentiment.
     
-    \item \textbf{Error Severity:} Not all misclassifications have equal consequences. Accuracy doesn't distinguish between narrowly missing borderline cases versus confidently misclassifying clear-cut examples. Human evaluators naturally weight these errors differently based on severity and confidence level.
+    \item \textbf{Understanding vs. Pattern Matching:} Humans want to know if the model understands negation, sarcasm, or context. ``I didn't like it'' being classified correctly could mean understanding negation or just pattern-matching ``didn't like.'' Accuracy only checks the final label.
 \end{enumerate}
 
 
